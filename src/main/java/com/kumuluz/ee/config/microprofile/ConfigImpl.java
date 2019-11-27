@@ -17,7 +17,7 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.config.microprofile;
 
 import java.io.Serializable;
@@ -50,10 +50,9 @@ import com.kumuluz.ee.config.microprofile.utils.AlternativeTypesUtil;
 public class ConfigImpl implements Config, Serializable {
 	private static final Logger logger = Logger.getLogger(ConfigImpl.class.getCanonicalName());
 
+    private static final String ARRAY_SEPARATOR_REGEX = "(?<!\\\\)" + Pattern.quote(",");
     private Map<Type, Converter> converters;
     private List<ConfigSource> configSources;
-
-    private static final String ARRAY_SEPARATOR_REGEX = "(?<!\\\\)" + Pattern.quote(",");
 
     public ConfigImpl(List<ConfigSource> configSources, Map<Type, Converter> converters) {
         this.configSources = configSources;
@@ -111,7 +110,7 @@ public class ConfigImpl implements Config, Serializable {
                 Array.set(arr, i, a.get(i));
             }
 
-            return (T)arr;
+            return (T) arr;
         }
 
         Converter<T> converter = getConverter(asType);
@@ -152,13 +151,13 @@ public class ConfigImpl implements Config, Serializable {
         return converter;
     }
 
-	@Override
-	public Iterable<String> getPropertyNames() {
-		return this.configSources.stream().flatMap(e -> e.getPropertyNames().stream()).collect(Collectors.toSet());
-	}
+    @Override
+    public Iterable<String> getPropertyNames() {
+        return this.configSources.stream().flatMap(e -> e.getPropertyNames().stream()).collect(Collectors.toSet());
+    }
 
-	@Override
-	public Iterable<ConfigSource> getConfigSources() {
-		return this.configSources;
-	}
+    @Override
+    public Iterable<ConfigSource> getConfigSources() {
+        return this.configSources;
+    }
 }

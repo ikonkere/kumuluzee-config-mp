@@ -59,18 +59,18 @@ public class ConfigSourceAdapter implements ConfigSource {
     
     @Override
     public String getValue(String s) {
-    	String val = configurationSource.get(s).orElse(null);
-    	
-    	if (val != null) {
-	        Optional<Integer> listSize = this.configurationSource.getListSize(s);
-	        
-	        //this is a list or an array
-	    	if (listSize.isPresent()) {
-	    		//we ignore the returned value and build the array
-	            return buildArray(s, listSize.get());
-	    	}
-    	}
-    	
+        String val = configurationSource.get(s).orElse(null);
+
+        if (val != null) {
+            Optional<Integer> listSize = this.configurationSource.getListSize(s);
+
+            //this is a list or an array
+            if (listSize.isPresent()) {
+                //we ignore the returned value and build the array
+                return buildArray(s, listSize.get());
+            }
+        }
+
         return val;
     }
 
@@ -106,28 +106,23 @@ public class ConfigSourceAdapter implements ConfigSource {
             }
         }
     }
-	
-	private String buildArray(String propertyName, int size) {
-		StringBuilder sb = new StringBuilder();
 
-		for (int i = 0; i < size; i++) {
-			String prefix = String.format("%s[%d]", propertyName, i);
-	        Optional<List<String>> objectKeys = this.configurationSource.getMapKeys(prefix);
+    private String buildArray(String propertyName, int size) {
+        StringBuilder sb = new StringBuilder();
 
-	        //array item is an object, so we just omit it
-	        if (objectKeys.isPresent()) {
-	        	sb.append("");
-	        }
-	        else {
-				Optional<String> item = this.configurationSource.get(String.format("%s[%d]", propertyName, i));
-				item.ifPresent(sb::append);
-	        }
-			
-			if (i < size - 1) {
-				sb.append(',');
-			}
-		}
-		
-		return sb.toString();
-	}	
+        for (int i = 0; i < size; i++) {
+            String prefix = String.format("%s[%d]", propertyName, i);
+            Optional<List<String>> objectKeys = this.configurationSource.getMapKeys(prefix);
+
+            if (!objectKeys.isPresent()) {
+                Optional<String> item = this.configurationSource.get(String.format("%s[%d]", propertyName, i));
+                if (i > 0) {
+                    sb.append(',');
+                }
+                item.ifPresent(sb::append);
+            } // else array item is an object, so we just omit it
+        }
+
+        return sb.toString();
+    }
 }
